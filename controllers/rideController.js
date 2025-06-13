@@ -1,8 +1,8 @@
-// controllers/rideController.js
-import { RideType } from '../models/RideType.js';
-import { Driver } from '../models/Driver.js';
-import { getRouteInfo } from '../utils/getRouteInfo.js';
-import { getDriverETAs } from '../utils/getDriverETAs.js';
+                // controllers/rideController.js
+                import { RideType } from '../models/RideType.js';
+                import { Driver } from '../models/Driver.js';
+                import { getRouteInfo } from '../utils/getRouteInfo.js';
+                import { getDriverETAs } from '../utils/getDriverETAs.js';
 
 export const getNearbyRideTypes = async (req, res) => {
     try {
@@ -12,26 +12,27 @@ export const getNearbyRideTypes = async (req, res) => {
             return res.status(400).json({ error: 'Pickup and drop locations are required.' });
         }
 
-        // Get distance, time, and polyline between pickup and drop
         const route = await getRouteInfo(pickup, drop);
         const rideTypes = await RideType.find({});
         const results = [];
-
+        console.log('📍 Pickup Coordinates:', pickup);
         for (const type of rideTypes) {
-            // Find nearby drivers for this vehicle type
             const drivers = await Driver.find({
                 vehicleType: type.name,
                 isOnline: true,
                 location: {
                     $nearSphere: {
                         $geometry: { type: 'Point', coordinates: [pickup.lng, pickup.lat] },
-                        $maxDistance: 5000 // 5km radius
+                        $maxDistance: 10000
                     }
                 }
             });
 
             // Calculate ETA to pickup for each driver
             const driverList = await getDriverETAs(drivers, pickup);
+
+            // ✅ SKIP if no drivers are available
+            if (driverList.length === 0) continue;
 
             const estimatedTime = Math.ceil(route.distanceInKm / type.avgSpeed * 60);
             const estimatedPrice = Math.round(type.baseFare + (type.farePerKm * route.distanceInKm));
@@ -47,7 +48,14 @@ export const getNearbyRideTypes = async (req, res) => {
                 nearbyDriversAvailable: driverList
             });
         }
-
+        if (results.length === 0) {
+            return res.status(200).json({
+                message: 'No nearby rides available at the moment.',
+                distanceInKm: route.distanceInKm,
+                routePolyline: route.polyline,
+                nearestRidesAvailable: []
+            });
+        }
         res.json({
             distanceInKm: route.distanceInKm,
             routePolyline: route.polyline,
@@ -59,3 +67,4 @@ export const getNearbyRideTypes = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch nearby ride types' });
     }
 };
+                
