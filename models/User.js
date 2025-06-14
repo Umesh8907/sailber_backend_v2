@@ -15,23 +15,32 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    passwordHash: {
-        type: String,
-        required: true
-    },
+
     role: {
         type: String,
         enum: ['rider', 'driver'],
         default: 'rider'
     },
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
+
     profilePicture: {
         type: String,
         default: null
     }
+    ,
+
+    emergencyContact: {
+
+        type: String,
+        required: false,
+        default: null,
+
+    },
+    primaryAddress: {
+        type: String,
+        default: null,
+        required: false
+    },
+
 }, {
     timestamps: true
 });

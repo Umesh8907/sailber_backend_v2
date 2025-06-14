@@ -23,12 +23,12 @@ export const tokenExchange = async (req, res) => {
       // Existing user: check if profile needs completion
       let isProfileComplete = true;
 
-      if (role === 'driver') {
-        const driverProfile = await Driver.findOne({ userId: user._id });
-        if (!driverProfile) {
-          isProfileComplete = false;
-        }
-      }
+      // if (role === 'driver') {
+      //   const driverProfile = await Driver.findOne({ userId: user._id });
+      //   if (!driverProfile) {
+      //     isProfileComplete = false;
+      //   }
+      // }
 
       // Generate JWT
       const jwtPayload = {
@@ -36,7 +36,6 @@ export const tokenExchange = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        isVerified: user.isVerified
       };
 
       const accessToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, {
@@ -66,3 +65,57 @@ export const tokenExchange = async (req, res) => {
     return res.status(401).json({ message: 'Invalid Firebase token' });
   }
 };
+
+
+export const createProfile = async (req, res) => {
+  const { firebaseIdToken, name, role, profilePicture, emergencyContact ,primaryAddress} = req.body;
+  if (!firebaseIdToken || !role) {
+    return res.status(400).json({ message: 'Missing token or role' });
+  }
+  const decodedToken = await adminAuth.verifyIdToken(firebaseIdToken);
+  const { uid, email, phone_number: phone } = decodedToken;
+  
+  if (!name ) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    // Check if user already exists
+    let user = await User.findOne({ $or: [{ email }, { phone }] });
+
+    if (user) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Create new user
+    user = new User({
+      _id: uid,
+      name,
+      phone,
+      email,
+      role,
+      profilePicture,
+      emergencyContact, 
+      primaryAddress
+    });
+
+    await user.save();
+
+    // // If driver, create driver profile
+    // if (role === 'driver') {
+    //   const driverProfile = new Driver({
+    //     userId: user._id,
+    //     vehicleType: null, // Set later
+    //     vehicleNumber: null // Set later
+    //   });
+    //   await driverProfile.save();
+    // }
+
+    return res.status(201).json({ message: 'Profile created successfully', user });
+  } catch (err) {
+    console.error('Error creating profile:', err);
+    return res.status(500).json({ message: 'Failed to create profile' });
+  }
+}
+
+
