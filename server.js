@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import rideRoutes from './routes/ride.js';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB connected'))
     .catch(err => console.error('❌ MongoDB connection  error:', err));
 
+app.use('/api',authRoutes);
 app.use('/api', rideRoutes);
 
 const PORT = process.env.PORT || 5000;

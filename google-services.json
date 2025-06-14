@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1033479035352",
+    "project_id": "sailber",
+    "storage_bucket": "sailber.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033479035352:android:80a9914e763bd0dab17aad",
+        "android_client_info": {
+          "package_name": "com.example.sailber"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033479035352-itqs4lbmc0jel8806c2hirdp7thu86o5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sailber",
+            "certificate_hash": "c39d40184d8af7deb446544b76bd40a20a948ec9"
+          }
+        },
+        {
+          "client_id": "1033479035352-ftq53sgi1os7b4aaacbt4bqc5adm5q9t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP2mp31DldA7QTOkOqvcNxJQBAtZbLic4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033479035352-beqqrgn4n25gnm5305c0t7uml3r6qjs6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
