@@ -14,10 +14,10 @@ export const tokenExchange = async (req, res) => {
     const decodedToken = await adminAuth.verifyIdToken(firebaseIdToken);
     const { uid, email, phone_number } = decodedToken;
 
+    console.log(uid)
+
     // Try finding the user
-    const user = await User.findOne({
-      $or: [{ email }, { phone: phone_number }]
-    });
+    const user = await User.findOne({uid:uid});
 
     if (user) {
       // Existing user: check if profile needs completion
