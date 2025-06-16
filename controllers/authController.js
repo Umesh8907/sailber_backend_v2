@@ -32,7 +32,7 @@ export const tokenExchange = async (req, res) => {
 
       // Generate JWT
       const jwtPayload = {
-        uid: user._id,
+        uid: user.uid,
         email: user.email,
         phone: user.phone,
         role: user.role,
@@ -89,7 +89,7 @@ export const createProfile = async (req, res) => {
 
     // Create new user
     user = new User({
-      _id: uid,
+      uid,
       name,
       phone,
       email,
