@@ -81,7 +81,7 @@ export const createProfile = async (req, res) => {
 
   try {
     // Check if user already exists
-    let user = await User.findOne({ $or: [{ email }, { phone }] });
+    let user = await User.findOne({ uid });
 
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
