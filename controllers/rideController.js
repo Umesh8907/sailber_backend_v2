@@ -49,6 +49,7 @@ export const getNearbyRideTypes = async (req, res) => {
                 baseFare: type.baseFare,
                 farePerKm: type.farePerKm,
                 avgSpeed: type.avgSpeed,
+                description: type.description,
                 estimatedPrice,
                 estimatedTime: `${estimatedTime} mins`,
                 nearbyDriversAvailable: driverListWithVehicleType
@@ -67,6 +68,7 @@ export const getNearbyRideTypes = async (req, res) => {
         res.json({
             distanceInKm: route.distanceInKm,
             routePolyline: route.polyline,
+            estimatedTimeInMinutes: route.estimatedTimeInMinutes,
             nearestRidesAvailable: results
         });
 
@@ -77,24 +79,3 @@ export const getNearbyRideTypes = async (req, res) => {
 };
 
 
-export const getMyBookings = async (req, res) => {
-    // try {
-    //     const userId = req.user.uid;
-
-    //     // Fetch bookings for the user
-    //     const bookings = await RideType.find({ userId });
-
-    //     if (!bookings || bookings.length === 0) {
-    //         return res.status(404).json({ message: 'No bookings found for this user.' });
-    //     }
-
-    //     res.json(bookings);
-    // } catch (err) {
-    //     console.error('❌ Error in getMyBookings:', err);
-    //     res.status(500).json({ error: 'Failed to fetch bookings' });
-    // }
-      res.json({
-        message: `Welcome ${req.user.role}`,
-        userId: req.user.uid,
-      });
-}
