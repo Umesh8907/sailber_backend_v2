@@ -68,19 +68,24 @@ export const tokenExchange = async (req, res) => {
 
 
 export const createProfile = async (req, res) => {
-  const { firebaseIdToken, name, role, profilePicture, emergencyContact, addressName, addressType, coordinates } = req.body;
+  const {
+    firebaseIdToken,
+    name,
+    role,
+    profilePicture,
+    emergencyContact,
+    addressName,
+    addressType,
+    coordinates
+  } = req.body;
 
-  if (!firebaseIdToken || !role) {
-    return res.status(400).json({ message: 'Missing token or role' });
+  if (!firebaseIdToken || !role || !name) {
+    return res.status(400).json({ message: 'Missing required fields: token, role, or name' });
   }
 
   try {
     const decodedToken = await adminAuth.verifyIdToken(firebaseIdToken);
     const { uid, email, phone_number: phone } = decodedToken;
-
-    if (!name) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
 
     // Check if user already exists
     let user = await User.findOne({ uid });
@@ -90,13 +95,19 @@ export const createProfile = async (req, res) => {
 
     // Validate location if provided
     let formattedLocation = undefined;
-    if (coordinates && Array.isArray(coordinates) && coordinates.length === 2) {
+    if (
+      coordinates &&
+      Array.isArray(coordinates) &&
+      coordinates.length === 2 &&
+      typeof coordinates[0] === 'number' &&
+      typeof coordinates[1] === 'number'
+    ) {
       formattedLocation = {
         type: 'Point',
-        coordinates: coordinates
+        coordinates
       };
     }
-    console.log(formattedLocation)
+
     // Create new user
     user = new User({
       uid,
@@ -113,12 +124,18 @@ export const createProfile = async (req, res) => {
 
     await user.save();
 
-    return res.status(201).json({ message: 'Profile created successfully', user });
+    return res.status(201).json({
+      message: 'Profile created successfully',
+      user: {
+        name: user.name,
+        role: user.role,
+        profilePicture: user.profilePicture,
+        email: user.email
+      }
+    });
   } catch (err) {
     console.error('Error creating profile:', err);
     return res.status(500).json({ message: 'Failed to create profile' });
   }
 };
-
-
 
