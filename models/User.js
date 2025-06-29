@@ -38,10 +38,27 @@ const userSchema = new mongoose.Schema({
         default: null,
 
     },
-    primaryAddress: {
+    addessName: {
         type: String,
         default: null,
         required: false
+    },
+    addressType: {
+        type: String,
+        enum: ['home', 'office','work', 'other'],
+        default: 'home'
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point',
+            required: true
+        },
+        coordinates: {
+            type: [Number], // [lng, lat]
+            required: true
+        }
     },
 
 }, {

@@ -17,7 +17,7 @@ export const tokenExchange = async (req, res) => {
     console.log(uid)
 
     // Try finding the user
-    const user = await User.findOne({uid:uid});
+    const user = await User.findOne({ uid: uid });
 
     if (user) {
       // Existing user: check if profile needs completion
@@ -68,25 +68,35 @@ export const tokenExchange = async (req, res) => {
 
 
 export const createProfile = async (req, res) => {
-  const { firebaseIdToken, name, role, profilePicture, emergencyContact ,primaryAddress} = req.body;
+  const { firebaseIdToken, name, role, profilePicture, emergencyContact, addressName, addressType, coordinates } = req.body;
+
   if (!firebaseIdToken || !role) {
     return res.status(400).json({ message: 'Missing token or role' });
   }
-  const decodedToken = await adminAuth.verifyIdToken(firebaseIdToken);
-  const { uid, email, phone_number: phone } = decodedToken;
-  
-  if (!name ) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
 
   try {
+    const decodedToken = await adminAuth.verifyIdToken(firebaseIdToken);
+    const { uid, email, phone_number: phone } = decodedToken;
+
+    if (!name) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
     // Check if user already exists
     let user = await User.findOne({ uid });
-
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Validate location if provided
+    let formattedLocation = undefined;
+    if (coordinates && Array.isArray(coordinates) && coordinates.length === 2) {
+      formattedLocation = {
+        type: 'Point',
+        coordinates: coordinates
+      };
+    }
+    console.log(formattedLocation)
     // Create new user
     user = new User({
       uid,
@@ -95,27 +105,20 @@ export const createProfile = async (req, res) => {
       email,
       role,
       profilePicture,
-      emergencyContact, 
-      primaryAddress
+      emergencyContact,
+      addessName: addressName || null,
+      addressType: addressType || 'home',
+      location: formattedLocation
     });
 
     await user.save();
-
-    // // If driver, create driver profile
-    // if (role === 'driver') {
-    //   const driverProfile = new Driver({
-    //     userId: user._id,
-    //     vehicleType: null, // Set later
-    //     vehicleNumber: null // Set later
-    //   });
-    //   await driverProfile.save();
-    // }
 
     return res.status(201).json({ message: 'Profile created successfully', user });
   } catch (err) {
     console.error('Error creating profile:', err);
     return res.status(500).json({ message: 'Failed to create profile' });
   }
-}
+};
+
 
 
