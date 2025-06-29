@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
         default: null,
 
     },
-    addessName: {
+    addressName: {
         type: String,
         default: null,
         required: false

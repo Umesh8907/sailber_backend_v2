@@ -106,7 +106,7 @@ export const createProfile = async (req, res) => {
       role,
       profilePicture,
       emergencyContact,
-      addessName: addressName || null,
+      addressName: addressName || null,
       addressType: addressType || 'home',
       location: formattedLocation
     });
